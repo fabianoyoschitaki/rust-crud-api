@@ -1,0 +1,2 @@
+# .dockerignore: to ignore files and folders that we don't want to copy in the image filesystem
+**/target

@@ -1,0 +1,34 @@
+# We have two services, rustapp and db. The rustapp service is built using the Dockerfile we created before. 
+# The db service uses the official Postgres image. We are using the depends_on property to ensure the db service is started before the rustapp service.
+version: '3.9'
+services:
+  rustapp:
+    container_name: rustapp
+    image: fabianoyoschitaki/rustapp:1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        TEST_ARG: this-is-a-test-arg-declared-in-docker-compose-and-accepted-by-dockerfile-as-arg-and-put-into-TEST-env-variable-to-be-used-by-rust-app
+        DATABASE_URL_ARG: postgres://postgres:postgres@db:5432/postgres
+        PROD_STAGE_TEST_ARG: this-should-display-when-running-env-inside-the-container-while-the-other-shouldnt-since-they-are-used-only-in-docker-build-stage
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+
+  db:
+    container_name: db
+    image: 'postgres:12'
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+# We also use a named volume, pg_data, to persist the database data.
+  pgdata: {}
